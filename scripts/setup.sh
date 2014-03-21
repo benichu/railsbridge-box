@@ -2,9 +2,9 @@
 
 set -e
 
-echo "Instaling for Railsbridge-MTL"
+echo "Installing for Railsbridge-MTL"
 
-# Installing vagrant keys
+# Install vagrant keys
 mkdir ~/.ssh
 chmod 700 ~/.ssh
 cd ~/.ssh
@@ -12,21 +12,45 @@ wget --no-check-certificate 'https://raw.github.com/mitchellh/vagrant/master/key
 chmod 600 ~/.ssh/authorized_keys
 chown -R vagrant ~/.ssh
 
-# Node.js Setup
-wget --retry-connrefused -q -O - https://raw.github.com/creationix/nvm/master/install.sh | sh
-source ~/.nvm/nvm.sh
+# Railsbridge MOTD
+sudo apt-get install update-motd
+sudo rm /etc/update-motd.d/*
 
-nvm install 0.10.18
-nvm alias default 0.10.18
+sudo sh -c "cat > /etc/update-motd.d/10-railsbridge << 'EOT'
+#!/bin/sh
 
-echo "source ~/.nvm/nvm.sh" >> ~/.bash_profile
+echo '   ========================================'
+echo '    ____      _     ___  _      ____'
+echo '   |  _ \    / \   |_ _|| |    / ___|'
+echo '   | |_) |  / _ \   | | | |    \___ \'
+echo '   |  _ <  / ___ \  | | | |___  ___) |'
+echo '   |_|_\_\/_/__ \_\|___||_____||____/_____'
+echo '   | __ ) |  _ \ |_ _||  _ \  / ___|| ____|'
+echo '   |  _ \ | |_) | | | | | | || |  _ |  _|'
+echo '   | |_) ||  _ <  | | | |_| || |_| || |___'
+echo '   |____/ |_| \_\|___||____/  \____||_____|'
+echo ''
+echo '   ========================================'
 
-# RVM Install
-# wget --retry-connrefused -q -O - https://get.rvm.io | bash -s stable
-# source /home/vagrant/.rvm/scripts/rvm
+EOT"
 
-# rvm autolibs read-fail
+sudo chmod +x /etc/update-motd.d/10-railsbridge
+# Force message
+sudo run-parts /etc/update-motd.d/
 
-# rvm install 2.0.0-p195
+# Install rbenv and Ruby
+rm -rf /home/vagrant/.rbenv
+git clone git://github.com/sstephenson/rbenv.git /home/vagrant/.rbenv
+echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> /home/vagrant/.bash_profile
+echo 'eval "$(rbenv init -)"' >> /home/vagrant/.bash_profile
+source /home/vagrant/.bash_profile
+git clone https://github.com/sstephenson/ruby-build.git /home/vagrant/.rbenv/plugins/ruby-build
+rbenv install 2.1.1 && rbenv global 2.1.1
 
-# gem install bundler
+# get Rails running
+cd /vagrant
+echo "gem: --no-ri --no-rdoc" > /home/vagrant/.gemrc
+gem install bundler
+gem install rails
+
+#

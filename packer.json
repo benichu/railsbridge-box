@@ -11,6 +11,7 @@
         "initrd=/install/initrd.gz -- <enter><wait>"
       ],
       "boot_wait": "4s",
+      "disk_size": 10240,
       "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
       "guest_os_type": "Ubuntu_64",
       "headless": false,
@@ -29,16 +30,17 @@
           "modifyvm",
           "{{.Name}}",
           "--memory",
-          "1024"
+          "384"
         ],
         [
           "modifyvm",
           "{{.Name}}",
           "--cpus",
-          "2"
+          "1"
         ]
       ],
-      "virtualbox_version_file": ".vbox_version"
+      "virtualbox_version_file": ".vbox_version",
+      "vm_name": "railsbridge-ubuntu-13.10-amd64"
     }
   ],
   "post-processors": [
@@ -52,13 +54,15 @@
         }
       },
       "scripts": [
-        "scripts/root_setup.sh"
-      ],
-      "type": "shell"
-    },
-    {
-      "scripts": [
-        "scripts/setup.sh"
+          "scripts/ubuntu/update.sh",
+          "scripts/common/sshd.sh",
+          "scripts/ubuntu/networking.sh",
+          "scripts/ubuntu/sudoers.sh",
+          "scripts/common/vagrant.sh",
+          "scripts/common/vmtools.sh",
+          "scripts/setup.sh",
+          "scripts/ubuntu/cleanup.sh",
+          "scripts/common/minimize.sh"
       ],
       "type": "shell"
     }
